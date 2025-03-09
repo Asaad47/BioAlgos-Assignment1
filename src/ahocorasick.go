@@ -112,33 +112,33 @@ func (ac *AhoCorasick) Search(textFilePath string) []string {
 	return matches
 }
 
-func (ac *AhoCorasick) BuildTrie(patternFilePaths []string) {
-	for _, patternFilePath := range patternFilePaths {
-		patternFile, err := os.Open(patternFilePath)
-		if err != nil {
-			fmt.Println("Error opening pattern file:", err)
+func (ac *AhoCorasick) BuildTrie(patternFilePath string) {
+	numPatterns := 0
+	patternFile, err := os.Open(patternFilePath)
+	if err != nil {
+		fmt.Println("Error opening pattern file:", err)
+		return
+	}
+	defer patternFile.Close()
+
+	scanner := bufio.NewScanner(patternFile)
+	for scanner.Scan() {
+		line := scanner.Text()
+		if strings.HasPrefix(line, "@") || strings.HasPrefix(line, "+") || strings.HasPrefix(line, "I") { // TODO: check if this is correct
 			continue
 		}
-		defer patternFile.Close()
-
-		scanner := bufio.NewScanner(patternFile)
-		for scanner.Scan() {
-			line := scanner.Text()
-			if strings.HasPrefix(line, "@") || strings.HasPrefix(line, "+") { // TODO: check if this is correct
-				continue
-			}
-			line = strings.ToLower(strings.TrimSpace(line))
-			ac.AddPattern(line)
-			fmt.Println("Added pattern:", line)
-		}
-
-		if err := scanner.Err(); err != nil {
-			fmt.Println("Error reading pattern file:", err)
-		}
+		line = strings.ToLower(strings.TrimSpace(line))
+		ac.AddPattern(line)
+		numPatterns++
 	}
 
+	if err := scanner.Err(); err != nil {
+		fmt.Println("Error reading pattern file:", err)
+	}
+	fmt.Println("Number of patterns added:", numPatterns)
+
 	ac.ComputeFailureLinks()
-	fmt.Println("Failure links computed")
+	fmt.Println("Failure links computed!")
 }
 
 // TODO: implement main function and test
@@ -146,16 +146,29 @@ func main() {
 	if len(os.Args) == 2 && os.Args[1] == "test" {
 		fmt.Println("Ran: go run ahocorasick.go test")
 		ac := NewAhoCorasick()
-		ac.BuildTrie([]string{
-			"test/pattern1.txt",
-			"test/pattern2.txt",
-			"test/pattern3.txt",
-		})
+		ac.BuildTrie("test/pattern.txt")
 		matches := ac.Search("test/text.txt")
 		fmt.Println("Found matches:")
+		numMatches := 0
 		for _, match := range matches {
 			fmt.Println(match)
+			numMatches++
 		}
+		fmt.Println("Number of matches:", numMatches)
 		return
 	}
+
+	patternFilePath := "../data/sequence-reads/simulated_reads_no_errors_10k_R1.fastq"
+	textFilePath := "../data/1_ecoli_ncbi_dataset/ncbi_dataset/data/GCF_000005845.2/GCF_000005845.2_ASM584v2_genomic.fna"
+
+	ac := NewAhoCorasick()
+	ac.BuildTrie(patternFilePath)
+	matches := ac.Search(textFilePath)
+	fmt.Println("Found matches:")
+	numMatches := 0
+	for _, match := range matches {
+		fmt.Println(match)
+		numMatches++
+	}
+	fmt.Println("Number of matches:", numMatches)
 }
