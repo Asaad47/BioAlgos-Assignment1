@@ -74,6 +74,7 @@ func (ac *AhoCorasick) Search(textFilePath string) []string {
 
 	matches := []string{}
 	textIndex := 0
+	current := ac.root
 	for scanner.Scan() {
 		line := scanner.Text()
 		if strings.HasPrefix(line, ">") {
@@ -81,7 +82,6 @@ func (ac *AhoCorasick) Search(textFilePath string) []string {
 		}
 		line = strings.ToLower(strings.TrimSpace(line))
 
-		current := ac.root
 		for _, char := range line {
 			textIndex++
 			for current != nil && current.children[char] == nil {
@@ -149,26 +149,64 @@ func main() {
 		ac.BuildTrie("test/pattern.txt")
 		matches := ac.Search("test/text.txt")
 		fmt.Println("Found matches:")
-		numMatches := 0
 		for _, match := range matches {
 			fmt.Println(match)
-			numMatches++
 		}
-		fmt.Println("Number of matches:", numMatches)
+		fmt.Println("Number of matches:", len(matches))
 		return
-	}
+	} else if len(os.Args) == 2 && os.Args[1] == "all" {
+		patternFilePaths := []string{
+			"../data/sequence-reads/simulated_reads_no_errors_10k_R1.fastq",
+			"../data/sequence-reads/simulated_reads_no_errors_10k_R2.fastq",
+			// "../data/sequence-reads/simulated_reads_miseq_10k_R1.fastq",
+			// "../data/sequence-reads/simulated_reads_miseq_10k_R2.fastq",
+		}
+		textFilePaths := []string{
+			"../data/1_ecol_ncbi_dataset/ncbi_dataset/data/GCF_000005845.2/GCF_000005845.2_ASM584v2_genomic.fna",
+			"../data/2_bsub_ncbi_dataset/ncbi_dataset/data/GCF_000009045.1/GCF_000009045.1_ASM904v1_genomic.fna",
+			"../data/3_paer_ncbi_dataset/ncbi_dataset/data/GCF_000006765.1/GCF_000006765.1_ASM676v1_genomic.fna",
+			"../data/4_saur_ncbi_dataset/ncbi_dataset/data/GCF_000013425.1/GCF_000013425.1_ASM1342v1_genomic.fna",
+			"../data/5_mtub_ncbi_dataset/ncbi_dataset/data/GCF_000195955.2/GCF_000195955.2_ASM19595v2_genomic.fna",
+		}
+		for _, patternFilePath := range patternFilePaths {
+			ac := NewAhoCorasick()
+			ac.BuildTrie(patternFilePath)
+			for _, textFilePath := range textFilePaths {
+				matches := ac.Search(textFilePath)
+				fmt.Println("Pattern file:", patternFilePath)
+				fmt.Println("Text file:", textFilePath)
+				fmt.Println("Found matches:")
+				// for _, match := range matches {
+				// 	fmt.Println(match)
+				// }
+				fmt.Println("Number of matches:", len(matches))
+			}
+		}
+	} else if len(os.Args) == 2 && os.Args[1] == "pattern-test" {
+		patternFilePath := "../data/sequence-reads/simulated_reads_no_errors_10k_R1.fastq"
+		// textFilePath := "../data/1_ecol_ncbi_dataset/ncbi_dataset/data/GCF_000005845.2/GCF_000005845.2_ASM584v2_genomic.fna"
+		textFilePath := "test/simulated_no_errors_text.txt" // outputs two matches (2nd and 3rd patterns)
 
-	patternFilePath := "../data/sequence-reads/simulated_reads_no_errors_10k_R1.fastq"
-	textFilePath := "../data/1_ecoli_ncbi_dataset/ncbi_dataset/data/GCF_000005845.2/GCF_000005845.2_ASM584v2_genomic.fna"
-
-	ac := NewAhoCorasick()
-	ac.BuildTrie(patternFilePath)
-	matches := ac.Search(textFilePath)
-	fmt.Println("Found matches:")
-	numMatches := 0
-	for _, match := range matches {
-		fmt.Println(match)
-		numMatches++
+		fmt.Println("Pattern file:", patternFilePath)
+		fmt.Println("Text file:", textFilePath)
+		ac := NewAhoCorasick()
+		ac.BuildTrie(patternFilePath)
+		matches := ac.Search(textFilePath)
+		fmt.Println("Found matches:")
+		for _, match := range matches {
+			fmt.Println(match)
+		}
+		fmt.Println("Number of matches:", len(matches))
+	} else if len(os.Args) == 2 && os.Args[1] == "text-test" {
+		patternFilePath := "test/ecoli_pattern.txt"
+		textFilePath := "../data/1_ecol_ncbi_dataset/ncbi_dataset/data/GCF_000005845.2/GCF_000005845.2_ASM584v2_genomic.fna"
+		ac := NewAhoCorasick()
+		ac.BuildTrie(patternFilePath)
+		matches := ac.Search(textFilePath)
+		fmt.Println("Found matches:")
+		for _, match := range matches {
+			fmt.Println(match)
+		}
+		fmt.Println("Number of matches:", len(matches))
 	}
-	fmt.Println("Number of matches:", numMatches)
 }
