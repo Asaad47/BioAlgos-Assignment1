@@ -1,4 +1,16 @@
 # Introduction
+- [Introduction](#introduction)
+- [Task 1: Metagenome Classification by String Matching](#task-1-metagenome-classification-by-string-matching)
+  - [Task 1.1 (Multiple Matches)](#task-11-multiple-matches)
+  - [Task 1.2 (Exact Matching)](#task-12-exact-matching)
+  - [Task 1.4 (Comparison with Bioinformatics tools)](#task-14-comparison-with-bioinformatics-tools)
+- [Task 2: Metagenomic classification by k-mer index](#task-2-metagenomic-classification-by-k-mer-index)
+  - [Task 2.1 (Build the k-mer Index)](#task-21-build-the-k-mer-index)
+  - [Task 2.2 (Implement Classification)](#task-22-implement-classification)
+  - [Task 2.3 (Minimzers)](#task-23-minimzers)
+- [Task 3: Real-world data and tools](#task-3-real-world-data-and-tools)
+  - [Task 3.1 (Comparison)](#task-31-comparison)
+  - [Task 3.2 (Real-world use case)](#task-32-real-world-use-case)
 
 # Task 1: Metagenome Classification by String Matching
 
