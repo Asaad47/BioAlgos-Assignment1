@@ -384,6 +384,99 @@ Classifying reads.
 
 ## Task 2.3 (Minimzers)
 
+1. Classification Results:
+    - Total sequence reads processed: 20,000
+    - Matched (minimizer) reads per organism:
+      - E. coli        : 6,177 reads, 3,972,502 minimizer matches
+      - B. subtilis    : 1,041 reads, 672,715 minimizer matches
+      - P. aeruginosa  : 1,084 reads, 632,656 minimizer matches
+      - S. aureus      : 1,084 reads, 669,813 minimizer matches
+      - M. tuberculosis: 1,024 reads, 664,123 minimizer matches
+
+2. Match Statistics:
+    - Reads with unique matches: 10,106 (50.53%)
+    - Reads with multiple matches: 126 (0.63%)
+    - Reads with no matches: 9,768 (48.84%)
+
+3. Comparison with K-mer Based Approach:
+    - The minimizer based approach shows different results because:
+      - A single read can match multiple times in different positions
+      - Minimizer matching allows for partial matches
+    - The classification accuracy results are not significantly different between the two approaches.
+      - Minimzer based appraoch has a slightly lower matching rate (51.16%) than the k-mer based approach (51.27%).
+
+4. Memory Consumption Comparison:
+    - The minimizer based approach has a significant reduction in memory consumption compared to the k-mer based approach.
+      - Minimzer based appraoch has a maximum resident set size of 1,753,595,904 bytes (~1.63GB) compared to the k-mer based approach's 5,394,333,696 bytes (~5.02GB).
+
+
+<br>
+
+Run `/usr/bin/time -l go run task_2_3.go` to get the results for this task.
+
+<details>
+<summary>Output for this task:</summary>
+<br>
+
+```bash
+/usr/bin/time -l go run task_2_3.go
+
+================================================================================
+Minimizer-Based Classification Report
+================================================================================
+
+Building minimizer index with k=31 and w=10
+Processing genome: E. coli
+Genome length (E. coli): 4641652
+Processing genome: B. subtilis
+Genome length (B. subtilis): 4215606
+Processing genome: P. aeruginosa
+Genome length (P. aeruginosa): 6264404
+Processing genome: S. aureus
+Genome length (S. aureus): 2821361
+Processing genome: M. tuberculosis
+Genome length (M. tuberculosis): 4411532
+
+Classifying reads using minimizers.
+
+1. Classification Results:
+    Total sequence reads processed: 20000
+    Matched (minimizer) reads per organism:
+     E. coli        : 6177 reads, 3972502 minimizer matches
+     B. subtilis    : 1041 reads, 672715 minimizer matches
+     P. aeruginosa  : 1084 reads, 632656 minimizer matches
+     S. aureus      : 1084 reads, 669813 minimizer matches
+     M. tuberculosis: 1024 reads, 664123 minimizer matches
+
+2. Match Statistics:
+    Reads with unique matches: 10106 (50.53%)
+    Reads with multiple matches: 126 (0.63%)
+    Reads with no matches: 9768 (48.84%)
+
+================================================================================
+        7.80 real        19.21 user         0.40 sys
+          1753595904  maximum resident set size
+                   0  average shared memory size
+                   0  average unshared data size
+                   0  average unshared stack size
+              124256  page reclaims
+                 105  page faults
+                   0  swaps
+                   0  block input operations
+                   0  block output operations
+                   0  messages sent
+                   0  messages received
+                1917  signals received
+                 951  voluntary context switches
+               14127  involuntary context switches
+           818889034  instructions retired
+           314528087  cycles elapsed
+            13845824  peak memory footprint
+```
+
+</details>
+
+
 # Task 3: Real-world data and tools
 
 ## Task 3.1 (Comparison)
