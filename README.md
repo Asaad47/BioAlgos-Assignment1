@@ -177,6 +177,102 @@ Run the following command (in `src/` directory) to get the results for all files
 
 ## Task 2.1 (Build the k-mer Index)
 
+1. Data Structure Description:
+  - Used a `map[string]*KmerStats` structure where:
+    - Key: k-mer sequence
+    - Value: `KmerStats` struct containing:
+      - `occurrences`: map of organism names to their counts
+      - `totalCount`: total occurrences across all genomes
+  - Justification: This structure allows O(1) lookup of k-mer occurrences, efficient tracking across multiple genomes, and works effeciently in our case with small genome sizes.
+
+2. K-mer Index Statistics:
+  - Total unique k-mers in index: 14,128,469
+  - K-mers per organism:
+    - E. coli        : 2,923,616 unique k-mers
+    - B. subtilis    : 2,662,309 unique k-mers
+    - P. aeruginosa  : 3,975,633 unique k-mers
+    - S. aureus      : 1,784,492 unique k-mers
+    - M. tuberculosis: 2,786,106 unique k-mers
+
+3. Theoretical Analysis:
+  - Max theoretical number of possible k-mers generally (k = 31): 4,611,686,018,427,387,904
+    - This is calculated as 4^k, where 4 represents the possible DNA bases (A,T,C,G).
+  - Theoretical number of possible k-mers (k = 31): 22,354,405
+    - This is calculated as the total genome length minus (k-1) times the number of genomes.
+
+4. Discrepancy Analysis:
+  - The actual number of k-mers (14,128,469) is much smaller than the max theoretical (4,611,686,018,427,387,904) because:
+    - DNA sequences are not random and they follow biological patterns.
+    - Many theoretical combinations never appear in real DNA due to biological constraints.
+    - Genome sequences have significant redundancy and patterns.
+  - Also, the actual number of k-mers (14,128,469) is significantly smaller than the possible theoretical limit (22,354,405):
+    - This is because the genome sequences have significant redundancy and patterns.
+
+<br>
+
+Run `/usr/bin/time -l go run task_2_1.go` to get the results for this task.
+
+<details>
+<summary>Output for this task:</summary>
+<br>
+
+```bash
+================================================================================
+K-mer Index Analysis Report
+================================================================================
+
+Building k-mer index with k = 31:
+Processing genome: E. coli
+Genome length (E. coli): 4641652
+Processing genome: B. subtilis
+Genome length (B. subtilis): 4215606
+Processing genome: P. aeruginosa
+Genome length (P. aeruginosa): 6264404
+Processing genome: S. aureus
+Genome length (S. aureus): 2821361
+Processing genome: M. tuberculosis
+Genome length (M. tuberculosis): 4411532
+
+1. Data Structure Description:
+        Used a map[string]*KmerStats structure.
+
+2. K-mer Index Statistics:
+        Total unique k-mers in index: 14128469
+        K-mers per organism:
+        E. coli        : 2923616 unique k-mers
+        B. subtilis    : 2662309 unique k-mers
+        P. aeruginosa  : 3975633 unique k-mers
+        S. aureus      : 1784492 unique k-mers
+        M. tuberculosis: 2786106 unique k-mers
+
+3. Theoretical and Discrepancy Analysis:
+        The actual number of k-mers: 14128469
+        The max theoretical number of k-mers (4^k): 4611686018427387904
+        The theoretical number of k-mers (total genome length - (k-1) * number of genomes): 22354405
+
+================================================================================
+       18.02 real        35.57 user         6.33 sys
+          5141397504  maximum resident set size
+                   0  average shared memory size
+                   0  average unshared data size
+                   0  average unshared stack size
+             1206375  page reclaims
+                2216  page faults
+                   0  swaps
+                   0  block input operations
+                   0  block output operations
+                   0  messages sent
+                   0  messages received
+                2576  signals received
+                1437  voluntary context switches
+              157227  involuntary context switches
+           813768512  instructions retired
+           321841346  cycles elapsed
+            13714688  peak memory footprint
+```
+
+</details>
+
 ## Task 2.2 (Implement Classification)
 
 ## Task 2.3 (Minimzers)
