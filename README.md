@@ -17,7 +17,24 @@
 ## Task 1.1 (Multiple Matches)
 
 ## Task 1.2 (Exact Matching)
+
+Used Aho-Corasick algorithm to find exact matches.
+
+- Total reads processed: 20,000
+- Total reads matching each organism:
+  - E. coli: 3,269
+  - B. subtilis: 553
+  - P. aeruginosa: 538
+  - S. aureus: 549
+  - M. tuberculosis: 548
+- Reads matching exactly one organism: 5,437 (27.19%)
+- Reads matching multiple organisms: 10 (0.05%)
+- Reads with no matches: 14,553 (72.76%)
+
+<br>
+
 Run `/usr/bin/time -l go run task_1_2.go all` to get the results for all files.
+
 <details>
 <summary>Output for this task:</summary>
 <br>
@@ -178,35 +195,35 @@ Run the following command (in `src/` directory) to get the results for all files
 ## Task 2.1 (Build the k-mer Index)
 
 1. Data Structure Description:
-  - Used a `map[string]*KmerStats` structure where:
-    - Key: k-mer sequence
-    - Value: `KmerStats` struct containing:
-      - `occurrences`: map of organism names to their counts
-      - `totalCount`: total occurrences across all genomes
-  - Justification: This structure allows O(1) lookup of k-mer occurrences, efficient tracking across multiple genomes, and works effeciently in our case with small genome sizes.
+     - Used a `map[string]*KmerStats` structure where:
+       - Key: k-mer sequence
+       - Value: `KmerStats` struct containing:
+         - `occurrences`: map of organism names to their counts
+         - `totalCount`: total occurrences across all genomes
+     - Justification: This structure allows O(1) lookup of k-mer occurrences, efficient tracking across multiple genomes, and works effeciently in our case with small genome sizes.
 
 2. K-mer Index Statistics:
-  - Total unique k-mers in index: 14,128,469
-  - K-mers per organism:
-    - E. coli        : 2,923,616 unique k-mers
-    - B. subtilis    : 2,662,309 unique k-mers
-    - P. aeruginosa  : 3,975,633 unique k-mers
-    - S. aureus      : 1,784,492 unique k-mers
-    - M. tuberculosis: 2,786,106 unique k-mers
+     - Total unique k-mers in index: 14,128,469
+     - K-mers per organism:
+       - E. coli        : 2,923,616 unique k-mers
+       - B. subtilis    : 2,662,309 unique k-mers
+       - P. aeruginosa  : 3,975,633 unique k-mers
+       - S. aureus      : 1,784,492 unique k-mers
+       - M. tuberculosis: 2,786,106 unique k-mers
 
 3. Theoretical Analysis:
-  - Max theoretical number of possible k-mers generally (k = 31): 4,611,686,018,427,387,904
-    - This is calculated as 4^k, where 4 represents the possible DNA bases (A,T,C,G).
-  - Theoretical number of possible k-mers (k = 31): 22,354,405
-    - This is calculated as the total genome length minus (k-1) times the number of genomes.
+     - Max theoretical number of possible k-mers generally (k = 31): 4,611,686,018,427,387,904
+       - This is calculated as 4^k, where 4 represents the possible DNA bases (A,T,C,G).
+     - Theoretical number of possible k-mers (k = 31): 22,354,405
+       - This is calculated as the total genome length minus (k-1) times the number of genomes.
 
 4. Discrepancy Analysis:
-  - The actual number of k-mers (14,128,469) is much smaller than the max theoretical (4,611,686,018,427,387,904) because:
-    - DNA sequences are not random and they follow biological patterns.
-    - Many theoretical combinations never appear in real DNA due to biological constraints.
-    - Genome sequences have significant redundancy and patterns.
-  - Also, the actual number of k-mers (14,128,469) is significantly smaller than the possible theoretical limit (22,354,405):
-    - This is because the genome sequences have significant redundancy and patterns.
+     - The actual number of k-mers (14,128,469) is much smaller than the max theoretical (4,611,686,018,427,387,904) because:
+       - DNA sequences are not random and they follow biological patterns.
+       - Many theoretical combinations never appear in real DNA due to biological constraints.
+       - Genome sequences have significant redundancy and patterns.
+     - Also, the actual number of k-mers (14,128,469) is significantly smaller than the possible theoretical limit (22,354,405):
+       - This is because the genome sequences have significant redundancy and patterns.
 
 <br>
 
@@ -274,6 +291,96 @@ Genome length (M. tuberculosis): 4411532
 </details>
 
 ## Task 2.2 (Implement Classification)
+
+1. Classification Results:
+    - Total reads processed: 20,000
+    - Matched reads per organism:
+      - E. coli        : 6,190 reads, 668,055 k-mer matches
+      - B. subtilis    : 1,056 reads, 113,283 k-mer matches
+      - P. aeruginosa  : 1,100 reads, 105,376 k-mer matches
+      - S. aureus      : 1,091 reads, 111,586 k-mer matches
+      - M. tuberculosis: 1,032 reads, 111,353 k-mer matches
+    - Reads with unique matches: 10,110 (50.55%)
+    - Reads with multiple matches: 144 (0.72%)
+    - Reads with no matches: 9,746 (48.73%)
+
+2. Comparison with String Matching Approach:
+     - The k-mer based approach shows different results because:
+       - A single read can match multiple times in different positions
+       - K-mer matches can overlap and be counted multiple times
+       - String matching looks for exact sequence matches, while k-mer matching allows for partial matches
+
+3. Handling Multiple Matches:
+    - Two numbers are reported for each organism:
+      - The first number is the number of reads that have a k-mer match to the organism.
+      - The second number is the number of k-mer matches for the organism.
+      - The second number is higher than the first number because a single read can have multiple k-mer matches to the same organism.
+    - The reported unique matches are based on the first number. This is because read matches are counted as a match if they have a k-mer match to the organism.
+
+
+<br>
+
+Run `/usr/bin/time -l go run task_2_2.go` to get the results for this task.
+
+<details>
+<summary>Output for this task:</summary>
+<br>
+
+```bash
+================================================================================
+K-mer Based Classification Report
+================================================================================
+
+Building k-mer index with k = 31:
+Processing genome: E. coli
+Genome length (E. coli): 4641652
+Processing genome: B. subtilis
+Genome length (B. subtilis): 4215606
+Processing genome: P. aeruginosa
+Genome length (P. aeruginosa): 6264404
+Processing genome: S. aureus
+Genome length (S. aureus): 2821361
+Processing genome: M. tuberculosis
+Genome length (M. tuberculosis): 4411532
+
+Classifying reads.
+
+1. Classification Results:
+        Total sequence reads processed: 20000
+        Matched (k-mer) reads per organism:
+     E. coli        : 6190 reads, 668055 k-mer matches
+     B. subtilis    : 1056 reads, 113283 k-mer matches
+     P. aeruginosa  : 1100 reads, 105376 k-mer matches
+     S. aureus      : 1091 reads, 111586 k-mer matches
+     M. tuberculosis: 1032 reads, 111353 k-mer matches
+
+2. Match Statistics:
+        Reads with unique matches: 10110 (50.55%)
+        Reads with multiple matches: 144 (0.72%)
+        Reads with no matches: 9746 (48.73%)
+
+================================================================================
+       11.39 real        32.05 user         3.51 sys
+          5394333696  maximum resident set size
+                   0  average shared memory size
+                   0  average unshared data size
+                   0  average unshared stack size
+              786747  page reclaims
+                2205  page faults
+                   0  swaps
+                   0  block input operations
+                   0  block output operations
+                   0  messages sent
+                   0  messages received
+                2155  signals received
+                1326  voluntary context switches
+              107546  involuntary context switches
+           809544219  instructions retired
+           317889284  cycles elapsed
+            13534528  peak memory footprint
+```
+
+</details>
 
 ## Task 2.3 (Minimzers)
 

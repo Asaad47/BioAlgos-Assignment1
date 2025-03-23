@@ -4,10 +4,16 @@ import (
 	"bufio"
 	"fmt"
 	"log"
-	"math"
 	"os"
 	"strings"
 )
+
+// SequenceReadMatch tracks matches for a single sequence read
+type SequenceReadMatch struct {
+	readID       string
+	matchedOrgs  map[string]int // maps organism to number of k-mer matches
+	totalMatches int            // total number of k-mer matches across all organisms
+}
 
 // KmerStats tracks the occurrence of a k-mer across genomes
 type KmerStats struct {
@@ -109,6 +115,63 @@ func getOrganismShortName(path string) string {
 	return filename
 }
 
+func extractKmers(sequence string, k int) []string {
+	sequence = strings.ToLower(strings.TrimSpace(sequence))
+	kmers := make([]string, 0, len(sequence)-k+1)
+	for i := 0; i <= len(sequence)-k; i++ {
+		kmers = append(kmers, sequence[i:i+k])
+	}
+	return kmers
+}
+
+func classifyReads(readFiles []string, kmerIndex map[string]*KmerStats, k int) map[string]*SequenceReadMatch {
+	readMatches := make(map[string]*SequenceReadMatch)
+
+	// Process each read file
+	for _, readFile := range readFiles {
+		file, err := os.Open(readFile)
+		if err != nil {
+			log.Fatalf("Failed to open read file: %v", err)
+		}
+		defer file.Close()
+
+		scanner := bufio.NewScanner(file)
+		var readID, sequence string
+		lineNum := 0
+
+		for scanner.Scan() {
+			line := scanner.Text()
+			switch lineNum % 4 {
+			case 0: // Header line
+				if strings.HasPrefix(line, "@") {
+					readID = strings.TrimSpace(line[1:]) + "_" + readFile
+					readMatches[readID] = &SequenceReadMatch{
+						readID:      readID,
+						matchedOrgs: make(map[string]int),
+					}
+				}
+			case 1: // Sequence line
+				sequence = line
+				kmers := extractKmers(sequence, k)
+
+				// check each k-mer against the index
+				for _, kmer := range kmers {
+					if stats, exists := kmerIndex[kmer]; exists {
+						// add matches for each organism
+						for organism, count := range stats.occurrences {
+							readMatches[readID].matchedOrgs[organism] += count
+							readMatches[readID].totalMatches += count
+						}
+					}
+				}
+			}
+			lineNum++
+		}
+	}
+
+	return readMatches
+}
+
 func main() {
 	k := 31
 	genomeFiles := []string{
@@ -119,41 +182,58 @@ func main() {
 		"../data/5_mtub_ncbi_dataset/ncbi_dataset/data/GCF_000195955.2/GCF_000195955.2_ASM19595v2_genomic.fna",
 	}
 
+	readFiles := []string{
+		"../data/sequence_reads/simulated_reads_no_errors_10k_R1.fastq",
+		"../data/sequence_reads/simulated_reads_no_errors_10k_R2.fastq",
+		"../data/sequence_reads/simulated_reads_miseq_10k_R1.fastq",
+		"../data/sequence_reads/simulated_reads_miseq_10k_R2.fastq",
+	}
+
 	fmt.Println("\n" + strings.Repeat("=", 80))
-	fmt.Println("K-mer Index Analysis Report")
+	fmt.Println("K-mer Based Classification Report")
 	fmt.Println(strings.Repeat("=", 80))
 
 	fmt.Printf("\nBuilding k-mer index with k = %d:\n", k)
-	kmerIndex, totalGenomeLength := buildKmerIndex(genomeFiles, k)
+	kmerIndex, _ := buildKmerIndex(genomeFiles, k)
 
-	totalKmers := len(kmerIndex)
-	maxTheoreticalKmers := int(math.Pow(4, float64(k))) // 4^k possible k-mers for DNA
-	theoreticalKmers := totalGenomeLength - (k-1)*len(genomeFiles)
+	fmt.Printf("\nClassifying reads.\n")
+	readMatches := classifyReads(readFiles, kmerIndex, k)
 
-	kmersPerOrg := make(map[string]int)
-	for _, stats := range kmerIndex {
-		for org, count := range stats.occurrences {
-			if count > 0 {
-				kmersPerOrg[org]++
-			}
+	orgReadCounts := make(map[string]int)
+	orgKmerCounts := make(map[string]int)
+	multipleMatches := 0
+	uniqueMatches := 0
+	noMatches := 0
+
+	for _, match := range readMatches {
+		if len(match.matchedOrgs) > 1 {
+			multipleMatches++
+		} else if len(match.matchedOrgs) == 1 {
+			uniqueMatches++
+		} else {
+			noMatches++
+		}
+		for org := range match.matchedOrgs {
+			orgReadCounts[org]++
+			orgKmerCounts[org] += match.matchedOrgs[org]
 		}
 	}
 
 	// Report:
-	fmt.Printf("\n1. Data Structure Description:\n")
-	fmt.Printf("	Used a map[string]*KmerStats structure.\n")
-
-	fmt.Printf("\n2. K-mer Index Statistics:\n")
-	fmt.Printf("	Total unique k-mers in index: %d\n", totalKmers)
-	fmt.Printf("	K-mers per organism:\n")
+	fmt.Printf("\n1. Classification Results:\n")
+	fmt.Printf("	Total sequence reads processed: %d\n", len(readMatches))
+	fmt.Printf("	Matched (k-mer) reads per organism:\n")
 	for _, orgName := range []string{"E. coli", "B. subtilis", "P. aeruginosa", "S. aureus", "M. tuberculosis"} {
-		fmt.Printf("	%-15s: %d unique k-mers\n", orgName, kmersPerOrg[orgName])
+		fmt.Printf("     %-15s: %d reads, %d k-mer matches\n", orgName, orgReadCounts[orgName], orgKmerCounts[orgName])
 	}
 
-	fmt.Printf("\n3. Theoretical and Discrepancy Analysis:\n")
-	fmt.Printf("	The actual number of k-mers: %d\n", totalKmers)
-	fmt.Printf("	The max theoretical number of k-mers (4^k): %d\n", maxTheoreticalKmers)
-	fmt.Printf("	The theoretical number of k-mers (total genome length - (k-1) * number of genomes): %d\n", theoreticalKmers)
+	fmt.Printf("\n2. Match Statistics:\n")
+	fmt.Printf("	Reads with unique matches: %d (%.2f%%)\n",
+		uniqueMatches, float64(uniqueMatches)*100/float64(len(readMatches)))
+	fmt.Printf("	Reads with multiple matches: %d (%.2f%%)\n",
+		multipleMatches, float64(multipleMatches)*100/float64(len(readMatches)))
+	fmt.Printf("	Reads with no matches: %d (%.2f%%)\n",
+		noMatches, float64(noMatches)*100/float64(len(readMatches)))
 
 	fmt.Println("\n" + strings.Repeat("=", 80))
 }
