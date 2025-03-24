@@ -89,9 +89,8 @@ Used Aho-Corasick algorithm to find exact matches.
 
 Run `/usr/bin/time -l go run task_1_2.go all` to get the results for all files.
 
-<details>
-<summary>Output for this task:</summary>
-<br>
+
+Output for this task:
 
 ```bash
 === Processing ../data/sequence_reads/simulated_reads_no_errors_10k_R1.fastq ===
@@ -201,8 +200,6 @@ Reads with no matches: 4999 (99.98%)
             13616384  peak memory footprint
 ```
 
-</details>
-
 
 ## Task 1.4 (Comparison with Bioinformatics tools)
 
@@ -219,9 +216,7 @@ Run `sh run_blast_analysis.sh` to get the results for this task.
 
 `run_blast_analysis.sh` assumes that the genome files are in the `data/` directory and to be run in the `src/` directory. Also, it uses `seqtk` to convert the FASTQ files to FASTA format, so a total of 3 commands are needed to be installed: `makeblastdb`, `blastn`, and, `seqtk`.
 
-<details>
-<summary>Output for this task:</summary>
-<br>
+Output for this task:
 
 ```bash
 Concatenating genome files into five_genomes.fna...
@@ -351,8 +346,6 @@ Summary for ../data/sequence_reads/simulated_reads_miseq_10k_R2_blast_results.tx
 Analysis complete!
 ```
 
-</details>
-
 # Task 2: Metagenomic classification by k-mer index
 
 ## Task 2.1 (Build the k-mer Index)
@@ -392,9 +385,7 @@ Analysis complete!
 
 Run `/usr/bin/time -l go run task_2_1.go` to get the results for this task.
 
-<details>
-<summary>Output for this task:</summary>
-<br>
+Output for this task:
 
 ```bash
 ================================================================================
@@ -451,8 +442,6 @@ Genome length (M. tuberculosis): 4411532
             13714688  peak memory footprint
 ```
 
-</details>
-
 ## Task 2.2 (Implement Classification)
 
 1. Classification Results:
@@ -485,9 +474,7 @@ Genome length (M. tuberculosis): 4411532
 
 Run `/usr/bin/time -l go run task_2_2.go` to get the results for this task.
 
-<details>
-<summary>Output for this task:</summary>
-<br>
+Output for this task:
 
 ```bash
 ================================================================================
@@ -543,8 +530,6 @@ Classifying reads.
             13534528  peak memory footprint
 ```
 
-</details>
-
 ## Task 2.3 (Minimzers)
 
 1. Classification Results:
@@ -577,9 +562,7 @@ Classifying reads.
 
 Run `/usr/bin/time -l go run task_2_3.go` to get the results for this task.
 
-<details>
-<summary>Output for this task:</summary>
-<br>
+Output for this task:
 
 ```bash
 /usr/bin/time -l go run task_2_3.go
@@ -636,8 +619,6 @@ Classifying reads using minimizers.
            314528087  cycles elapsed
             13845824  peak memory footprint
 ```
-
-</details>
 
 
 # Task 3: Real-world data and tools
