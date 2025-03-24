@@ -190,6 +190,153 @@ Run the following command (in `src/` directory) to get the results for all files
 
 ## Task 1.4 (Comparison with Bioinformatics tools)
 
+- Execution time:
+  - Not much difference in execution time between my implementation in Task 1.2 and `blastn` tool. They both took around 5 seconds to run. However, my implementation only considers exact matches while BLAST considers approximate matches.
+- Memory usage:
+  - My implementation's maximum resident set size was around 429MB while BLAST's was around 184MB.
+- The resulting counts are quite different.
+  - The BLAST tool uses a more sophisticated algorithm to find approximate matches and returns a larger number of matches.
+  - BLAST considers statistical significance of matches and requires parameters of `-max_target_seqs` and `-evalue` to control the number of matches returned.
+
+
+Run `sh run_blast_analysis.sh` to get the results for this task.
+
+`run_blast_analysis.sh` assumes that the genome files are in the `data/` directory and to be run in the `src/` directory. Also, it uses `seqtk` to convert the FASTQ files to FASTA format, so a total of 3 commands are needed to be installed: `makeblastdb`, `blastn`, and, `seqtk`.
+
+<details>
+<summary>Output for this task:</summary>
+<br>
+
+```bash
+Concatenating genome files into five_genomes.fna...
+Building BLAST database...
+
+
+Building a new DB, current time: 03/24/2025 03:29:37
+New DB name:   ./src/reference_db
+New DB title:  ../data/five_genomes.fna
+Sequence type: Nucleotide
+Keep MBits: T
+Maximum file size: 3000000000B
+Adding sequences from FASTA; added 5 sequences in 0.076303 seconds.
+
+
+Converting FASTQ files to FASTA format...
+Running BLAST for each read file...
+Output file ../data/sequence_reads/simulated_reads_no_errors_10k_R1_blast_results.txt not found. Creating empty file...
+Processing ../data/sequence_reads/simulated_reads_no_errors_10k_R1.fasta...
+        1.34 real         0.35 user         0.04 sys
+           192512000  maximum resident set size
+                   0  average shared memory size
+                   0  average unshared data size
+                   0  average unshared stack size
+               11576  page reclaims
+                 887  page faults
+                   0  swaps
+                   0  block input operations
+                   0  block output operations
+                  11  messages sent
+                  23  messages received
+                   0  signals received
+                   6  voluntary context switches
+                 376  involuntary context switches
+          4843612200  instructions retired
+          1380976406  cycles elapsed
+           118376064  peak memory footprint
+Output file ../data/sequence_reads/simulated_reads_no_errors_10k_R2_blast_results.txt not found. Creating empty file...
+Processing ../data/sequence_reads/simulated_reads_no_errors_10k_R2.fasta...
+        1.31 real         0.38 user         0.03 sys
+           182747136  maximum resident set size
+                   0  average shared memory size
+                   0  average unshared data size
+                   0  average unshared stack size
+               11711  page reclaims
+                  50  page faults
+                   0  swaps
+                   0  block input operations
+                   0  block output operations
+                  11  messages sent
+                  23  messages received
+                   0  signals received
+                   7  voluntary context switches
+                  88  involuntary context switches
+          4907632152  instructions retired
+          1357133345  cycles elapsed
+           116295232  peak memory footprint
+Output file ../data/sequence_reads/simulated_reads_miseq_10k_R1_blast_results.txt not found. Creating empty file...
+Processing ../data/sequence_reads/simulated_reads_miseq_10k_R1.fasta...
+        1.51 real         0.51 user         0.04 sys
+           187269120  maximum resident set size
+                   0  average shared memory size
+                   0  average unshared data size
+                   0  average unshared stack size
+               12385  page reclaims
+                  37  page faults
+                   0  swaps
+                   0  block input operations
+                   0  block output operations
+                  11  messages sent
+                  23  messages received
+                   0  signals received
+                   6  voluntary context switches
+                 109  involuntary context switches
+          6427546323  instructions retired
+          1824478843  cycles elapsed
+           112985600  peak memory footprint
+Output file ../data/sequence_reads/simulated_reads_miseq_10k_R2_blast_results.txt not found. Creating empty file...
+Processing ../data/sequence_reads/simulated_reads_miseq_10k_R2.fasta...
+        1.52 real         0.50 user         0.03 sys
+           188432384  maximum resident set size
+                   0  average shared memory size
+                   0  average unshared data size
+                   0  average unshared stack size
+               11983  page reclaims
+                  37  page faults
+                   0  swaps
+                   0  block input operations
+                   0  block output operations
+                  11  messages sent
+                  23  messages received
+                   0  signals received
+                  11  voluntary context switches
+                 130  involuntary context switches
+          6303387720  instructions retired
+          1793370325  cycles elapsed
+           113887104  peak memory footprint
+Generating classification summary...
+Summary for ../data/sequence_reads/simulated_reads_no_errors_10k_R1_blast_results.txt:
+3997 NC_000913.3
+ 683 NC_000962.3
+ 635 NC_000964.3
+ 625 NC_002516.2
+ 656 NC_007795.1
+------------------------------------------------
+Summary for ../data/sequence_reads/simulated_reads_no_errors_10k_R2_blast_results.txt:
+4095 NC_000913.3
+ 652 NC_000962.3
+ 691 NC_000964.3
+ 626 NC_002516.2
+ 653 NC_007795.1
+------------------------------------------------
+Summary for ../data/sequence_reads/simulated_reads_miseq_10k_R1_blast_results.txt:
+5286 NC_000913.3
+ 634 NC_000962.3
+ 696 NC_000964.3
+ 656 NC_002516.2
+ 740 NC_007795.1
+------------------------------------------------
+Summary for ../data/sequence_reads/simulated_reads_miseq_10k_R2_blast_results.txt:
+4461 NC_000913.3
+ 637 NC_000962.3
+ 750 NC_000964.3
+ 683 NC_002516.2
+ 756 NC_007795.1
+------------------------------------------------
+Analysis complete!
+```
+
+</details>
+
 # Task 2: Metagenomic classification by k-mer index
 
 ## Task 2.1 (Build the k-mer Index)

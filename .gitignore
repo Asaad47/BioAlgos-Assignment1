@@ -1,3 +1,4 @@
 data/
 *.pdf
 .DS_Store
+src/reference_db.*
