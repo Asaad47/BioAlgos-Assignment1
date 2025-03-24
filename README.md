@@ -10,6 +10,7 @@
   - [Task 2.3 (Minimzers)](#task-23-minimzers)
 - [Task 3: Real-world data and tools](#task-3-real-world-data-and-tools)
   - [Task 3.1 (Comparison)](#task-31-comparison)
+    - [Brief Analysis](#brief-analysis)
   - [Task 3.2 (Real-world use case)](#task-32-real-world-use-case)
 
 
@@ -641,6 +642,216 @@ Classifying reads using minimizers.
 
 # Task 3: Real-world data and tools
 
+<!-- Downloaded and installed Kraken2 using the following commands:
+```bash
+wget https://github.com/DerrickWood/kraken2/archive/refs/tags/v2.14.tar.gz
+
+tar -xzf v2.14.tar.gz
+
+cd kraken2-2.14
+
+./install_kraken2.sh ../kraken2-commands
+
+cd ../kraken2-commands
+
+echo 'export PATH=$PWD:$PATH' >> ~/.bashrc
+source ~/.bashrc
+``` -->
+
+Kraken2 was installed in Ibex cluster. To check if it is installed correctly, run the following command:
+```bash
+kraken2 --version
+```
+it returned the following output:
+```bash
+Kraken version 2.1.3
+Copyright 2013-2023, Derrick Wood (dwood@cs.jhu.edu)
+```
+
 ## Task 3.1 (Comparison)
+
+Sequence of commands to prepare custom database for Kraken2:
+```bash
+mkdir -p kraken2_custom_db/library
+
+pip install ncbi-genome-download
+
+echo -e "GCF_000005845.2\nGCF_000009045.1\nGCF_000006765.1\nGCF_000013425.1\nGCF_000195955.2" > accessions.txt
+
+ncbi-genome-download bacteria -A accessions.txt --formats fasta --output-folder library/
+
+mv library/refseq/bacteria/*/*.fna.gz library/
+gunzip library/*.fna.gz
+
+mv library/GCF_000005845.2_ASM584v2_genomic.fna library/511145.fna
+mv library/GCF_000009045.1_ASM904v1_genomic.fna library/224308.fna
+mv library/GCF_000006765.1_ASM676v1_genomic.fna library/208964.fna
+mv library/GCF_000013425.1_ASM1342v1_genomic.fna library/93061.fna
+mv library/GCF_000195955.2_ASM19595v2_genomic.fna library/83332.fna
+
+kraken2-build --download-taxonomy --db kraken2_custom_db
+for file in library/*.fna; do
+    kraken2-build --add-to-library "$file" --db kraken2_custom_db --no-masking  # --no-masking is used to avoid masking the reads and to finish the process faster
+done
+
+kraken2-build --build --db kraken2_custom_db
+```
+
+Running the following command to verify the database:
+```bash
+>>> kraken2-inspect --db kraken2_custom_db
+
+# Database options: nucleotide db, k = 35, l = 31
+# Spaced mask = 11111111111111111111111111111111110011001100110011001100110011
+# Toggle mask = 1110001101111110001010001100010000100111000110110101101000101101
+# Total taxonomy nodes: 41
+# Table size: 7176774
+# Table capacity: 10324845
+# Min clear hash value = 0
+100.00  7176774 0       R       1       root
+100.00  7176774 0       R1      131567    cellular organisms
+100.00  7176774 652     R2      2           Bacteria
+ 51.33  3684078 40      K       1783272       Bacillati
+ 31.66  2272323 0       P       1239            Bacillota
+ 31.66  2272323 0       C       91061             Bacilli
+ 31.66  2272323 482     O       1385                Bacillales
+ 18.95  1359651 0       F       186817                Bacillaceae
+ 18.95  1359651 0       G       1386                    Bacillus
+ 18.95  1359651 0       G1      653685                    Bacillus subtilis group
+ 18.95  1359651 0       S       1423                        Bacillus subtilis
+ 18.95  1359651 0       S1      135461                        Bacillus subtilis subsp. subtilis
+ 18.95  1359651 1359651 S2      224308                          Bacillus subtilis subsp. subtilis str. 168
+ 12.71  912190  0       F       90964                 Staphylococcaceae
+ 12.71  912190  0       G       1279                    Staphylococcus
+ 12.71  912190  0       S       1280                      Staphylococcus aureus
+ 12.71  912190  912190  S1      93061                       Staphylococcus aureus subsp. aureus NCTC 8325
+ 19.67  1411715 0       P       201174          Actinomycetota
+ 19.67  1411715 0       C       1760              Actinomycetes
+ 19.67  1411715 0       O       85007               Mycobacteriales
+ 19.67  1411715 0       F       1762                  Mycobacteriaceae
+ 19.67  1411715 0       G       1763                    Mycobacterium
+ 19.67  1411715 0       G1      77643                     Mycobacterium tuberculosis complex
+ 19.67  1411715 0       S       1773                        Mycobacterium tuberculosis
+ 19.67  1411715 1411715 S1      83332                         Mycobacterium tuberculosis H37Rv
+ 48.66  3492044 0       K       3379134       Pseudomonadati
+ 48.66  3492044 0       P       1224            Pseudomonadota
+ 48.66  3492044 506     C       1236              Gammaproteobacteria
+ 27.95  2005625 0       O       72274               Pseudomonadales
+ 27.95  2005625 0       F       135621                Pseudomonadaceae
+ 27.95  2005625 0       G       286                     Pseudomonas
+ 27.95  2005625 0       G1      136841                    Pseudomonas aeruginosa group
+ 27.95  2005625 0       S       287                         Pseudomonas aeruginosa
+ 27.95  2005625 2005625 S1      208964                        Pseudomonas aeruginosa PAO1
+ 20.70  1485913 0       O       91347               Enterobacterales
+ 20.70  1485913 0       F       543                   Enterobacteriaceae
+ 20.70  1485913 0       G       561                     Escherichia
+ 20.70  1485913 0       S       562                       Escherichia coli
+ 20.70  1485913 0       S1      83333                       Escherichia coli K-12
+ 20.70  1485913 1485913 S2      511145                        Escherichia coli str. K-12 substr. MG1655
+```
+
+Running the following command to classify the reads (with sequence reads stored in `seq_reads/`):
+```bash
+for file in seq_reads/*.fastq; do
+    kraken2 --db kraken2_custom_db/kraken2_custom_db --report "${file%.fastq}_report.txt" --output "${file%.fastq}_output.txt" --threads 4 "$file"
+done
+```
+Report result files can be found in `results/` directory.
+Output:
+```bash
+Loading database information... done.
+5000 sequences (1.50 Mbp) processed in 0.155s (1938.8 Kseq/m, 583.57 Mbp/m).
+  5000 sequences classified (100.00%)
+  0 sequences unclassified (0.00%)
+Loading database information... done.
+5000 sequences (1.50 Mbp) processed in 0.236s (1270.0 Kseq/m, 382.27 Mbp/m).
+  5000 sequences classified (100.00%)
+  0 sequences unclassified (0.00%)
+Loading database information... done.
+5000 sequences (0.62 Mbp) processed in 0.080s (3739.0 Kseq/m, 467.38 Mbp/m).
+  5000 sequences classified (100.00%)
+  0 sequences unclassified (0.00%)
+Loading database information... done.
+5000 sequences (0.62 Mbp) processed in 0.062s (4860.6 Kseq/m, 607.57 Mbp/m).
+  5000 sequences classified (100.00%)
+  0 sequences unclassified (0.00%)
+```
+
+Running the following command to generate the species abundance summary:
+```bash
+for file in seq_reads/*_report.txt; do
+  echo "=== Species Abundance Summary for $file ==="
+  awk '$4 ~ /^S/ {printf "%s\t%s\t%s%%\n", $6, $2, $1}' "$file"
+  echo ""
+done
+```
+Output:
+```bash
+=== Species Abundance Summary for seq_reads/simulated_reads_miseq_10k_R1_report.txt ===
+Escherichia     2991    59.82%
+Escherichia     2991    59.82%
+Escherichia     2991    59.82%
+Pseudomonas     500     10.00%
+Pseudomonas     500     10.00%
+Staphylococcus  500     10.00%
+Staphylococcus  500     10.00%
+Bacillus        500     10.00%
+Bacillus        500     10.00%
+Bacillus        500     10.00%
+Mycobacterium   500     10.00%
+Mycobacterium   500     10.00%
+
+=== Species Abundance Summary for seq_reads/simulated_reads_miseq_10k_R2_report.txt ===
+Escherichia     2993    59.86%
+Escherichia     2993    59.86%
+Escherichia     2993    59.86%
+Pseudomonas     500     10.00%
+Pseudomonas     500     10.00%
+Staphylococcus  500     10.00%
+Staphylococcus  500     10.00%
+Bacillus        500     10.00%
+Bacillus        500     10.00%
+Bacillus        500     10.00%
+Mycobacterium   500     10.00%
+Mycobacterium   500     10.00%
+
+=== Species Abundance Summary for seq_reads/simulated_reads_no_errors_10k_R1_report.txt ===
+Escherichia     2990    59.80%
+Escherichia     2990    59.80%
+Escherichia     2990    59.80%
+Pseudomonas     500     10.00%
+Pseudomonas     500     10.00%
+Staphylococcus  500     10.00%
+Staphylococcus  500     10.00%
+Bacillus        499     9.98%
+Bacillus        499     9.98%
+Bacillus        499     9.98%
+Mycobacterium   500     10.00%
+Mycobacterium   500     10.00%
+
+=== Species Abundance Summary for seq_reads/simulated_reads_no_errors_10k_R2_report.txt ===
+Escherichia     2993    59.86%
+Escherichia     2993    59.86%
+Escherichia     2993    59.86%
+Pseudomonas     500     10.00%
+Pseudomonas     500     10.00%
+Staphylococcus  500     10.00%
+Staphylococcus  500     10.00%
+Bacillus        500     10.00%
+Bacillus        500     10.00%
+Bacillus        500     10.00%
+Mycobacterium   500     10.00%
+Mycobacterium   500     10.00%
+```
+
+### Brief Analysis
+
+- The abundance estimates are identical in each file, with no apparent variation between samples.
+- All reads are classified — no unclassified or ambiguous reads appear in the report.
+- The species abundance summary shows different results to other approaches of Task 1 and 2, where here the abundance estimates are similar between all reads and only matching the `simulated_reads_no_errors_10K_R1.fastq` classification. But in previous tasks, the abundance estimates were different between different reads.
+- The Kraken2 classification is faster than the other approaches of Task 1 and 2 and uses less memory. 
+- Considering `simulated_reads_no_errors_10K_R1.fastq` file, the impact of the minimizer scheme did not affect the classification results, and this might be due to the fact that the reads are simulated and do not contain any errors. Also, the genomes used are not closely related to each other. 
+- In general, using full k-mer index would be more accurate than using minimizer index as the full index captures more low frequency k-mers.
+- So, the two methods differ in a trade-off between computational resources and accuracy. The minimizer index is faster and uses less memory but at the cost of accuracy while the full index is more accurate but slower and has higher memory usage.
 
 ## Task 3.2 (Real-world use case)
