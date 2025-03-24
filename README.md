@@ -12,9 +12,62 @@
   - [Task 3.1 (Comparison)](#task-31-comparison)
   - [Task 3.2 (Real-world use case)](#task-32-real-world-use-case)
 
+
+
+To reproduce the results for all tasks, install the genome and reads data to the `data/` directory.
+
+Save given sequence reads to `data/sequence_reads/` directory. Download genome data from NCBI and rename each genome ncbi dataset directory to its corresponding name of the following:
+- `1_ecol_ncbi_dataset/`
+- `2_bsub_ncbi_dataset/`
+- `3_paer_ncbi_dataset/`
+- `4_saur_ncbi_dataset/`
+- `5_mtub_ncbi_dataset/`
+
+In the end, the `data/` directory should look like this:
+
+```bash
+data/
+├── 1_ecol_ncbi_dataset/
+├── 2_bsub_ncbi_dataset/
+├── 3_paer_ncbi_dataset/
+├── 4_saur_ncbi_dataset/
+├── 5_mtub_ncbi_dataset/
+├── sequence_reads/
+│   ├── simulated_reads_no_errors_10k_R1.fastq
+│   ├── simulated_reads_no_errors_10k_R2.fastq
+│   ├── simulated_reads_miseq_10k_R1.fastq
+│   ├── simulated_reads_miseq_10k_R2.fastq
+```
+
+For each task, a command is described to reproduce the results by running the program in the `src/` directory.
+
 # Task 1: Metagenome Classification by String Matching
 
 ## Task 1.1 (Multiple Matches)
+
+- Proposed method for handling multiple matches
+  - Track all matches with counts:
+    - For each read, maintain a map of organisms to match counts
+    - Record both:
+      - Number of distinct matches (how many organisms matched)
+      - Number of matching positions for each organism
+  - Classification rules:
+    - If a read matches exactly one organism: classify as that organism
+    - If a read matches multiple organisms:
+      - Compare the number of matching positions for each organism
+      - If one organism has significantly more matches: classify as that organism
+      - Otherwise: mark as ambiguous/multiple match
+  - Biological justification:
+    - Multiple matches often indicate conserved regions between organisms
+    - Some bacterial species share significant portions of their genomes due to, for example, common ancestry or preservation of essential genes.
+  - Computational efficiency
+    - Space efficiency:
+      - Using a map structure for tracking matches requires O(m) space per read, where m is the number of matching organisms
+      - From the implementation results, we see that most reads match 0 or 1 organism, making this space overhead minimal
+    - Time efficiency:
+      - The approach requires only one pass through the matches
+      - No need for complex post-processing or multiple comparisons
+      - Can be integrated directly into the existing Aho-Corasick implementation shown in `task_1_2.go`
 
 ## Task 1.2 (Exact Matching)
 
@@ -149,44 +202,6 @@ Reads with no matches: 4999 (99.98%)
 
 </details>
 
-
-<details>
-<summary>To reproduce the results for this task:</summary>
-<br>
-
-Install the genome and reads data to the `data/` directory.
-
-Save sequence reads to `data/sequence_reads/` directory. Download genome data from NCBI and rename each genome ncbi dataset directory to its corresponding name of the following:
-- `1_ecol_ncbi_dataset/`
-- `2_bsub_ncbi_dataset/`
-- `3_paer_ncbi_dataset/`
-- `4_saur_ncbi_dataset/`
-- `5_mtub_ncbi_dataset/`
-
-In the end, the `data/` directory should look like this:
-
-```bash
-data/
-├── 1_ecol_ncbi_dataset/
-├── 2_bsub_ncbi_dataset/
-├── 3_paer_ncbi_dataset/
-├── 4_saur_ncbi_dataset/
-├── 5_mtub_ncbi_dataset/
-├── sequence_reads/
-│   ├── simulated_reads_no_errors_10k_R1.fastq
-│   ├── simulated_reads_no_errors_10k_R2.fastq
-│   ├── simulated_reads_miseq_10k_R1.fastq
-│   ├── simulated_reads_miseq_10k_R2.fastq
-```
-
-Run the following command (in `src/` directory) to get the results for all files:
-
-```bash
-/usr/bin/time -l go run task_1_2.go all
-```
-
-
-</details>
 
 ## Task 1.4 (Comparison with Bioinformatics tools)
 
