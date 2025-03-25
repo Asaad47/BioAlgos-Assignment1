@@ -7,7 +7,7 @@
 - [Task 2: Metagenomic classification by k-mer index](#task-2-metagenomic-classification-by-k-mer-index)
   - [Task 2.1 (Build the k-mer Index)](#task-21-build-the-k-mer-index)
   - [Task 2.2 (Implement Classification)](#task-22-implement-classification)
-  - [Task 2.3 (Minimzers)](#task-23-minimzers)
+  - [Task 2.3 (Minimizers)](#task-23-minimizers)
 - [Task 3: Real-world data and tools](#task-3-real-world-data-and-tools)
   - [Task 3.1 (Comparison)](#task-31-comparison)
     - [Brief Analysis](#brief-analysis)
@@ -88,7 +88,7 @@ Used Aho-Corasick algorithm to find exact matches.
 
 <br>
 
-Run `/usr/bin/time -l go run task_1_2.go all` to get the results for all files.
+- Run `/usr/bin/time -l go run task_1_2.go` to get the results for all files.
 
 
 Output for this task:
@@ -212,10 +212,13 @@ Reads with no matches: 4999 (99.98%)
   - The BLAST tool uses a more sophisticated algorithm to find approximate matches and returns a larger number of matches.
   - BLAST considers statistical significance of matches and requires parameters of `-max_target_seqs` and `-evalue` to control the number of matches returned.
 
+<br>
 
-Run `sh run_blast_analysis.sh` to get the results for this task.
+`run_blast_analysis.sh` is a script that runs the BLAST tool on the sequence reads and generates a summary of the results. It first concatenates the genome files into one file and builds a BLAST database from it. Then, it converts the sequence reads to FASTA format and runs BLAST on each read file. Finally, it generates a summary of the results.
 
 `run_blast_analysis.sh` assumes that the genome files are in the `data/` directory and to be run in the `src/` directory. Also, it uses `seqtk` to convert the FASTQ files to FASTA format, so a total of 3 commands are needed to be installed: `makeblastdb`, `blastn`, and, `seqtk`.
+
+- Run `sh run_blast_analysis.sh` to get the results for this task.
 
 Output for this task:
 
@@ -384,7 +387,7 @@ Analysis complete!
 
 <br>
 
-Run `/usr/bin/time -l go run task_2_1.go` to get the results for this task.
+- Run `/usr/bin/time -l go run task_2_1.go` to get the results for this task.
 
 Output for this task:
 
@@ -473,7 +476,7 @@ Genome length (M. tuberculosis): 4411532
 
 <br>
 
-Run `/usr/bin/time -l go run task_2_2.go` to get the results for this task.
+- Run `/usr/bin/time -l go run task_2_2.go` to get the results for this task.
 
 Output for this task:
 
@@ -531,7 +534,7 @@ Classifying reads.
             13534528  peak memory footprint
 ```
 
-## Task 2.3 (Minimzers)
+## Task 2.3 (Minimizers)
 
 1. Classification Results:
     - Total sequence reads processed: 20,000
@@ -561,7 +564,7 @@ Classifying reads.
 
 <br>
 
-Run `/usr/bin/time -l go run task_2_3.go` to get the results for this task.
+- Run `/usr/bin/time -l go run task_2_3.go` to get the results for this task.
 
 Output for this task:
 
@@ -679,7 +682,7 @@ done
 kraken2-build --build --db kraken2_custom_db
 ```
 
-Running the following command to verify the database:
+- Run the following command to verify the database:
 ```bash
 >>> kraken2-inspect --db kraken2_custom_db
 
@@ -731,14 +734,12 @@ Running the following command to verify the database:
  20.70  1485913 0       S1      83333                       Escherichia coli K-12
  20.70  1485913 1485913 S2      511145                        Escherichia coli str. K-12 substr. MG1655
 ```
-
-Running the following command to classify the reads (with sequence reads stored in `seq_reads/`):
+- Have sequence reads stored in `seq_reads/` directory and run the following command to classify the reads (copies of the report files can be found in `results/` directory):
 ```bash
 for file in seq_reads/*.fastq; do
     kraken2 --db kraken2_custom_db/kraken2_custom_db --report "${file%.fastq}_report.txt" --output "${file%.fastq}_output.txt" --threads 4 "$file"
 done
 ```
-Report result files can be found in `results/` directory.
 Output:
 ```bash
 Loading database information... done.
@@ -759,7 +760,7 @@ Loading database information... done.
   0 sequences unclassified (0.00%)
 ```
 
-Running the following command to generate the species abundance summary:
+- Run the following command to generate the species abundance summary:
 ```bash
 for file in seq_reads/*_report.txt; do
   echo "=== Species Abundance Summary for $file ==="
