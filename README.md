@@ -12,6 +12,7 @@
   - [Task 3.1 (Comparison)](#task-31-comparison)
     - [Brief Analysis](#brief-analysis)
   - [Task 3.2 (Real-world use case)](#task-32-real-world-use-case)
+    - [Brief Analysis](#brief-analysis-1)
 
 
 
@@ -836,3 +837,224 @@ Mycobacterium   500     10.00%
 - So, the two methods differ in a trade-off between computational resources and accuracy. The minimizer index is faster and uses less memory but at the cost of accuracy while the full index is more accurate but slower and has higher memory usage.
 
 ## Task 3.2 (Real-world use case)
+
+Sequence of commands to prepare custom database for Kraken2:
+
+- Download and extract the Standard-8 database:
+```bash
+wget https://genome-idx.s3.amazonaws.com/kraken/k2_standard_08gb_20241228.tar.gz
+tar -xvzf k2_standard_08gb_20241228.tar.gz
+```
+- Move all extracted files to `standard8/` directory.
+  - To verify that the database is correctly configured, run `kraken2-inspect --db standard8` command.
+
+- Download the sequence reads from the SRA database using `sra_download.sh` script.
+  - The script downloads the reads from `ebi.ac.uk` api as I was not able to download the reads using `fastq-dump` command.
+- Move files to `SRR_reads/` directory, and unzip them using `gunzip` command.
+
+- Run the following command to classify the reads:
+```bash
+for fq in SRR_reads/*.fastq; do
+  kraken2 --db standard8 --report "${fq%.fastq}_report.txt" --output "${fq%.fastq}_output.txt" --threads 4 "$fq"
+done
+```
+Output:
+```bash
+Loading database information... done.
+19515475 sequences (2926.03 Mbp) processed in 72.718s (16102.2 Kseq/m, 2414.27 Mbp/m).
+  8619706 sequences classified (44.17%)
+  10895769 sequences unclassified (55.83%)
+Loading database information... done.
+19515475 sequences (2924.44 Mbp) processed in 72.638s (16120.0 Kseq/m, 2415.62 Mbp/m).
+  8479389 sequences classified (43.45%)
+  11036086 sequences unclassified (56.55%)
+Loading database information... done.
+16558897 sequences (2482.83 Mbp) processed in 62.079s (16004.3 Kseq/m, 2399.68 Mbp/m).
+  11953045 sequences classified (72.19%)
+  4605852 sequences unclassified (27.81%)
+Loading database information... done.
+16558897 sequences (2480.85 Mbp) processed in 61.863s (16060.3 Kseq/m, 2406.15 Mbp/m).
+  11616117 sequences classified (70.15%)
+  4942780 sequences unclassified (29.85%)
+Loading database information... done.
+19795127 sequences (2968.08 Mbp) processed in 74.023s (16045.1 Kseq/m, 2405.79 Mbp/m).
+  10503634 sequences classified (53.06%)
+  9291493 sequences unclassified (46.94%)
+Loading database information... done.
+19795127 sequences (2965.80 Mbp) processed in 73.697s (16116.1 Kseq/m, 2414.58 Mbp/m).
+  10214819 sequences classified (51.60%)
+  9580308 sequences unclassified (48.40%)
+Loading database information... done.
+21457804 sequences (3212.91 Mbp) processed in 78.021s (16501.6 Kseq/m, 2470.81 Mbp/m).
+  6372221 sequences classified (29.70%)
+  15085583 sequences unclassified (70.30%)
+Loading database information... done.
+21457804 sequences (3205.17 Mbp) processed in 77.202s (16676.6 Kseq/m, 2491.00 Mbp/m).
+  6165002 sequences classified (28.73%)
+  15292802 sequences unclassified (71.27%)
+Loading database information... done.
+19866883 sequences (2976.50 Mbp) processed in 73.742s (16164.7 Kseq/m, 2421.84 Mbp/m).
+  9853808 sequences classified (49.60%)
+  10013075 sequences unclassified (50.40%)
+Loading database information... done.
+19866883 sequences (2970.16 Mbp) processed in 74.103s (16085.9 Kseq/m, 2404.89 Mbp/m).
+  9535786 sequences classified (48.00%)
+  10331097 sequences unclassified (52.00%)
+Loading database information... done.
+877209 sequences (132.46 Mbp) processed in 2.562s (20543.7 Kseq/m, 3102.10 Mbp/m).
+  479877 sequences classified (54.70%)
+  397332 sequences unclassified (45.30%)
+Loading database information... done.
+877209 sequences (132.46 Mbp) processed in 2.634s (19984.6 Kseq/m, 3017.68 Mbp/m).
+  547789 sequences classified (62.45%)
+  329420 sequences unclassified (37.55%)
+Loading database information... done.
+2 sequences (0.00 Mbp) processed in 0.026s (4.6 Kseq/m, 0.70 Mbp/m).
+  1 sequences classified (50.00%)
+  1 sequences unclassified (50.00%)
+Loading database information... done.
+1113095 sequences (168.08 Mbp) processed in 3.142s (21257.3 Kseq/m, 3209.86 Mbp/m).
+  441313 sequences classified (39.65%)
+  671782 sequences unclassified (60.35%)
+Loading database information... done.
+1113095 sequences (168.08 Mbp) processed in 3.349s (19944.6 Kseq/m, 3011.64 Mbp/m).
+  435173 sequences classified (39.10%)
+  677922 sequences unclassified (60.90%)
+Loading database information... done.
+4 sequences (0.00 Mbp) processed in 0.047s (5.2 Kseq/m, 0.78 Mbp/m).
+  0 sequences classified (0.00%)
+  4 sequences unclassified (100.00%)
+Loading database information... done.
+523931 sequences (79.11 Mbp) processed in 1.553s (20246.5 Kseq/m, 3057.23 Mbp/m).
+  158405 sequences classified (30.23%)
+  365526 sequences unclassified (69.77%)
+Loading database information... done.
+523931 sequences (79.11 Mbp) processed in 1.520s (20682.6 Kseq/m, 3123.07 Mbp/m).
+  176571 sequences classified (33.70%)
+  347360 sequences unclassified (66.30%)
+Loading database information... done.
+181195 sequences (27.36 Mbp) processed in 0.654s (16625.6 Kseq/m, 2510.47 Mbp/m).
+  115033 sequences classified (63.49%)
+  66162 sequences unclassified (36.51%)
+Loading database information... done.
+181195 sequences (27.36 Mbp) processed in 0.648s (16786.7 Kseq/m, 2534.79 Mbp/m).
+  127914 sequences classified (70.59%)
+  53281 sequences unclassified (29.41%)
+Loading database information... done.
+546485 sequences (79.50 Mbp) processed in 1.735s (18896.9 Kseq/m, 2749.09 Mbp/m).
+  368317 sequences classified (67.40%)
+  178168 sequences unclassified (32.60%)
+Loading database information... done.
+546485 sequences (79.56 Mbp) processed in 1.850s (17728.6 Kseq/m, 2580.96 Mbp/m).
+  414350 sequences classified (75.82%)
+  132135 sequences unclassified (24.18%)
+```
+
+- Run the following command to generate the species abundance summary (A copy of this summary can be found in `results/combined_summary.txt`):
+```bash
+( for report in SRR_reads/*_report.txt; do echo "=== Summary for $report ==="; awk '$4 ~ /^S/ {printf "%s\t%s\t%s%%\n", $6, $2, $1}' "$report"; echo ""; done ) > combined_summary.txt
+
+```
+
+- Run the following command to group the species and print summary results (A copy of this summary can be found in `results/combined_summary_grouped.txt`):
+  - The script combines the species values of the same species and prints the top species for each sample.
+```bash
+python group_species.py
+```
+  The output is:
+```bash
+SRR_reads/SRR11412973_1_report.txt
+  Total species: 1118
+  Top species: Bacteroides (17.29%)
+
+SRR_reads/SRR11412973_2_report.txt
+  Total species: 1169
+  Top species: Bacteroides (17.32%)
+
+SRR_reads/SRR11412976_1_report.txt
+  Total species: 745
+  Top species: Bacteroides (29.57%)
+
+SRR_reads/SRR11412976_2_report.txt
+  Total species: 885
+  Top species: Bacteroides (29.57%)
+
+SRR_reads/SRR11412979_1_report.txt
+  Total species: 1223
+  Top species: Segatella (74.85%)
+
+SRR_reads/SRR11412979_2_report.txt
+  Total species: 1329
+  Top species: Segatella (74.78%)
+
+SRR_reads/SRR11412980_1_report.txt
+  Total species: 1478
+  Top species: Bacteroides (21.18%)
+
+SRR_reads/SRR11412980_2_report.txt
+  Total species: 1544
+  Top species: Bacteroides (21.26%)
+
+SRR_reads/SRR11412984_1_report.txt
+  Total species: 1353
+  Top species: Segatella (43.74%)
+
+SRR_reads/SRR11412984_2_report.txt
+  Total species: 1410
+  Top species: Segatella (43.76%)
+
+SRR_reads/SRR21907296_1_report.txt
+  Total species: 26
+  Top species: Severe (99.87%)
+
+SRR_reads/SRR21907296_2_report.txt
+  Total species: 62
+  Top species: Severe (98.7%)
+
+SRR_reads/SRR21907296_report.txt
+  Total species: 1
+  Top species: Severe (100.0%)
+
+SRR_reads/SRR21907303_1_report.txt
+  Total species: 255
+  Top species: Severe (98.59%)
+
+SRR_reads/SRR21907303_2_report.txt
+  Total species: 99
+  Top species: Severe (97.75%)
+
+SRR_reads/SRR21907303_report.txt
+  Total species: 0
+  Top species:  (0.0%)
+
+SRR_reads/SRR21907307_1_report.txt
+  Total species: 27
+  Top species: Severe (99.63%)
+
+SRR_reads/SRR21907307_2_report.txt
+  Total species: 44
+  Top species: Severe (94.12%)
+
+SRR_reads/SRR21907330_1_report.txt
+  Total species: 10
+  Top species: Severe (99.97%)
+
+SRR_reads/SRR21907330_2_report.txt
+  Total species: 14
+  Top species: Xanthomonas (72.06%)
+
+SRR_reads/SRR21907332_1_report.txt
+  Total species: 18
+  Top species: Severe (99.99%)
+
+SRR_reads/SRR21907332_2_report.txt
+  Total species: 19
+  Top species: Severe (99.98%)
+```
+
+### Brief Analysis
+
+- The number of species classified for gut samples (between 745 and 1455) is generally higher than the number of species classified for wastewater samples (between 10 and 255).
+- The top species classified in the gut samples are `Bacteroides` and `Segatella` while the top species classified in the wastewater samples are `Severe` and `Xanthomonas`.
+  - The former are related to gut microbiomes while the latter are related to plant pathogens that can occur in wastewater samples.
+- The two differences mentioned above can be good classifiers for gut and wastewater samples. Further analysis can be generally done, but I think the two differences mentioned above are already good indicators of the sample type in this case.
