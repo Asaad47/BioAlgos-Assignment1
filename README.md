@@ -1,5 +1,6 @@
 # Introduction
 - [Introduction](#introduction)
+  - [Setup](#setup)
 - [Task 1: Metagenome Classification by String Matching](#task-1-metagenome-classification-by-string-matching)
   - [Task 1.1 (Multiple Matches)](#task-11-multiple-matches)
   - [Task 1.2 (Exact Matching)](#task-12-exact-matching)
@@ -14,7 +15,9 @@
   - [Task 3.2 (Real-world use case)](#task-32-real-world-use-case)
     - [Brief Analysis](#brief-analysis-1)
 
+In this assignment, I had the opportunity to work with DNAs of 5 different organisms and sequence reads to classify them into different organisms, and also to use bioinformatics tools to classify the sequence reads. To do this classification, Aho-Corasick algorithm is used in [Task 1.2](#task-12-exact-matching) to do exact matching and compared with BLAST tool in [Task 1.4](#task-14-comparison-with-bioinformatics-tools). K-mer index and minimizer based classification are implemented in [Task 2.1](#task-21-build-the-k-mer-index), [Task 2.2](#task-22-implement-classification), and [Task 2.3](#task-23-minimizers). Finally, Kraken2 tool is used in [Task 3.1](#task-31-comparison) to classify the same sequence reads and compared to the results of the previous tasks, and also used to classify other sequence reads of human gut and wastewater samples in [Task 3.2](#task-32-real-world-use-case).
 
+## Setup
 
 To reproduce the results for all tasks, install the genome and reads data to the `data/` directory.
 
@@ -45,6 +48,12 @@ For each task, a command is described to reproduce the results by running the pr
 
 # Task 1: Metagenome Classification by String Matching
 
+For this task, Aho-Corasick algorithm is implemented in `task_1_2.go` and BLAST tool is used to compare the results in [Task 1.4](#task-14-comparison-with-bioinformatics-tools).
+
+The relevant files for this task are:
+- `src/task_1_2.go`
+- `src/run_blast_analysis.sh`
+
 ## Task 1.1 (Multiple Matches)
 
 - Proposed method for handling multiple matches
@@ -65,7 +74,7 @@ For each task, a command is described to reproduce the results by running the pr
   - Computational efficiency
     - Space efficiency:
       - Using a map structure for tracking matches requires O(m) space per read, where m is the number of matching organisms
-      - From the implementation results, we see that most reads match 0 or 1 organism, making this space overhead minimal
+      - From the implementation results in [Task 1.2](#task-12-exact-matching), we see that most reads match 0 or 1 organism, making this space overhead minimal
     - Time efficiency:
       - The approach requires only one pass through the matches
       - No need for complex post-processing or multiple comparisons
@@ -352,6 +361,13 @@ Analysis complete!
 
 # Task 2: Metagenomic classification by k-mer index
 
+For this task, k-mer index is implemented in [Task 2.1](#task-21-build-the-k-mer-index), k-mer based classification is implemented in [Task 2.2](#task-22-implement-classification), and minimizer based classification is implemented in [Task 2.3](#task-23-minimizers).
+
+The relevant files for this task are:
+- `src/task_2_1.go`
+- `src/task_2_2.go`
+- `src/task_2_3.go`
+
 ## Task 2.1 (Build the k-mer Index)
 
 1. Data Structure Description:
@@ -626,6 +642,20 @@ Classifying reads using minimizers.
 
 
 # Task 3: Real-world data and tools
+
+For this task, Kraken2 tool is used in Ibex cluster to classify the given sequence reads in [Task 3.1](#task-31-comparison) and used it to classify the gut and wastewater sequence reads in [Task 3.2](#task-32-real-world-use-case).
+
+The relevant files for this task are:
+- `sra_download.sh`
+- `src/group_species.py`
+- `results/combined_summary_grouped.txt`
+- `results/combined_summary.txt`
+- `results/simulated_reads_miseq_10k_R1_report.txt`
+- `results/simulated_reads_miseq_10k_R2_report.txt`
+- `results/simulated_reads_no_errors_10k_R1_report.txt`
+- `results/simulated_reads_no_errors_10k_R2_report.txt`
+
+<br>
 
 <!-- Downloaded and installed Kraken2 using the following commands:
 ```bash
